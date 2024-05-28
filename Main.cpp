@@ -1,33 +1,56 @@
-#include <iostream>
-#include <vector>
-#include <cctype>
-#include <stdexcept> 
-using namespace std;
-
-
-void drawBoard(const vector<vector<char>>& board) {
-    cout << "   A   B   C\n";
-    cout << "  +---+---+---+\n";
+bool checkWin(const vector<vector<char>>& board, char player) {
     for (int i = 0; i < 3; ++i) {
-        cout << i + 1 << " |";
-        for (int j = 0; j < 3; ++j) {
-            cout << " " << board[i][j] << " |";
+        if ((board[i][0] == player && board[i][1] == player && board[i][2] == player) ||  
+            (board[0][i] == player && board[1][i] == player && board[2][i] == player)) {  
+            return true;
         }
-        cout << "\n";
-        cout << "  +---+---+---+\n";
     }
+
+    if ((board[0][0] == player && board[1][1] == player && board[2][2] == player) ||  
+        (board[0][2] == player && board[1][1] == player && board[2][0] == player)) {  
+        return true;
+    }
+
+    return false;
 }
-pair<int, int> convertMove(const string& move) {
-    if (move.length() != 2) {
-        throw invalid_argument("Недійсний формат переміщення. Використовуйте формат '1A', '2B', etc.");
+
+int main() {
+    setlocale(LC_ALL, "Ukrainian");
+    vector<vector<char>> board(3, vector<char>(3, ' '));
+    string move;
+    char currentPlayer = 'X';
+    bool gameWon = false;
+
+    while (!gameWon) {
+        drawBoard(board);
+        cout << "гравець " << currentPlayer << ", введіть свій хід (e.g., 1A, 2B): ";
+        cin >> move;
+
+        try {
+            pair<int, int> coordinates = convertMove(move);
+            int row = coordinates.first;
+            int col = coordinates.second;
+
+            if (board[row][col] != ' ') {
+                cout << "Клітинка вже зайнята. Спробуйте знову.\n";
+                continue;
+            }
+
+            board[row][col] = currentPlayer;
+
+            if (checkWin(board, currentPlayer)) {
+                drawBoard(board);
+                cout << "Гравець " << currentPlayer << " переміг!\n";
+                gameWon = true;
+            }
+            else {
+                currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+            }
+        }
+        catch (const exception& e) {
+            cout << e.what() << " Спробуйте знову.\n";
+        }
     }
 
-    int row = move[0] - '1';
-    int col = toupper(move[1]) - 'A';
-
-    if (row < 0 || row >= 3 || col < 0 || col >= 3) {
-        throw invalid_argument("Вийти за межі.");
-    }
-
-    return { row, col };
+    return 0;
 }
