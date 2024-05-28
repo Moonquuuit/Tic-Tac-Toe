@@ -5,58 +5,29 @@
 using namespace std;
 
 
-bool checkWin(const vector<vector<char>>& board, char player) {
+void drawBoard(const vector<vector<char>>& board) {
+    cout << "   A   B   C\n";
+    cout << "  +---+---+---+\n";
     for (int i = 0; i < 3; ++i) {
-        if ((board[i][0] == player && board[i][1] == player && board[i][2] == player) || 
-            (board[0][i] == player && board[1][i] == player && board[2][i] == player)) { 
-            return true;
+        cout << i + 1 << " |";
+        for (int j = 0; j < 3; ++j) {
+            cout << " " << board[i][j] << " |";
         }
+        cout << "\n";
+        cout << "  +---+---+---+\n";
     }
-    if ((board[0][0] == player && board[1][1] == player && board[2][2] == player) ||   
-        (board[0][2] == player && board[1][1] == player && board[2][0] == player)) {  
-        return true;
-    }
-
-    return false;
 }
-
-int main() {
-    setlocale(LC_ALL, "Ukrainian");
-    vector<vector<char>> board(3, vector<char>(3, ' '));
-    string move;
-    char currentPlayer = 'X';
-    bool gameWon = false;
-
-    while (!gameWon) {
-        drawBoard(board);
-        cout << "„‡‚Âˆ¸ " << currentPlayer << ", ‚‚Â‰≥Ú¸ Ò‚≥È ı≥‰ (e.g., 1A, 2B): ";
-        cin >> move;
-
-        try {
-            pair<int, int> coordinates = convertMove(move);
-            int row = coordinates.first;
-            int col = coordinates.second;
-
-            if (board[row][col] != ' ') {
-                cout << " Î≥ÚËÌÍ‡ ‚ÊÂ Á‡ÈÌˇÚ‡. —ÔÓ·ÛÈÚÂ ÁÌÓ‚Û.\n";
-                continue;
-            }
-
-            board[row][col] = currentPlayer;
-
-            if (checkWin(board, currentPlayer)) {
-                drawBoard(board);
-                cout << "√‡‚Âˆ¸ " << currentPlayer << " ÔÂÂÏ≥„!\n";
-                gameWon = true;
-            }
-            else {
-                currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
-            }
-        }
-        catch (const exception& e) {
-            cout << e.what() << " —ÔÓ·ÛÈÚÂ ÁÌÓ‚Û.\n";
-        }
+pair<int, int> convertMove(const string& move) {
+    if (move.length() != 2) {
+        throw invalid_argument("–ù–µ–¥—ñ–π—Å–Ω–∏–π —Ñ–æ—Ä–º–∞—Ç –ø–µ—Ä–µ–º—ñ—â–µ–Ω–Ω—è. –í–∏–∫–æ—Ä–∏—Å—Ç–æ–≤—É–π—Ç–µ —Ñ–æ—Ä–º–∞—Ç '1A', '2B', etc.");
     }
 
-    return 0;
+    int row = move[0] - '1';
+    int col = toupper(move[1]) - 'A';
+
+    if (row < 0 || row >= 3 || col < 0 || col >= 3) {
+        throw invalid_argument("–í–∏–π—Ç–∏ –∑–∞ –º–µ–∂—ñ.");
+    }
+
+    return { row, col };
 }
